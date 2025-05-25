@@ -4,6 +4,7 @@ interface PreviewProps {
   brightness: number;
   contrast: number;
   beautyMode: boolean;
+  backgroundColor: string | null;
 }
 
 export default function Preview({
@@ -12,6 +13,7 @@ export default function Preview({
   brightness,
   contrast,
   beautyMode,
+  backgroundColor,
 }: PreviewProps) {
   const getImageStyle = () => {
     const filters = [];
@@ -45,13 +47,21 @@ export default function Preview({
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-700 mb-2">效果图</h3>
-          <div className="bg-blue-50 rounded-md overflow-hidden aspect-[3/4] flex items-center justify-center">
+          <div 
+            className="rounded-md overflow-hidden aspect-[3/4] flex items-center justify-center relative"
+            style={{ backgroundColor: backgroundColor || 'transparent' }}
+          >
             {processedImage ? (
               <img
                 src={processedImage}
                 alt="Processed"
                 className="w-full h-full object-cover"
-                style={getImageStyle()}
+                style={{
+                  ...getImageStyle(),
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                }}
               />
             ) : (
               <div className="text-gray-400">

@@ -72,6 +72,7 @@ export default function MainPage() {
   const [brightness, setBrightness] = useState(0);
   const [contrast, setContrast] = useState(0);
   const [beautyMode, setBeautyMode] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState<string | null>(null);
 
   const handleImageUpload = (image: string) => {
     setOriginalImage(image);
@@ -96,10 +97,69 @@ export default function MainPage() {
     }
 
     try {
-      const response = await fetch(processedImage);
-      if (!response.ok) throw new Error('图片加载失败');
+      // 创建一个canvas来合成图片
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('无法创建canvas上下文');
+
+      // 加载处理后的图片
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
       
-      const blob = await response.blob();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = processedImage;
+      });
+
+      // 解析规格尺寸（例如：35mm×49mm）
+      const [width, height] = selectedSpec.size.split('×').map(dim => 
+        parseFloat(dim.replace('mm', ''))
+      );
+      const targetRatio = width / height;
+
+      // 计算裁切尺寸
+      let cropWidth = img.width;
+      let cropHeight = img.height;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      const currentRatio = img.width / img.height;
+
+      if (currentRatio > targetRatio) {
+        // 图片太宽，需要裁切宽度
+        cropWidth = Math.round(img.height * targetRatio);
+        offsetX = Math.round((img.width - cropWidth) / 2);
+      } else {
+        // 图片太高，需要裁切高度
+        cropHeight = Math.round(img.width / targetRatio);
+        offsetY = Math.round((img.height - cropHeight) / 2);
+      }
+
+      // 设置canvas尺寸为目标尺寸
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
+
+      // 如果有背景色，先绘制背景
+      if (backgroundColor) {
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // 绘制裁切后的图片
+      ctx.drawImage(
+        img,
+        offsetX, offsetY, cropWidth, cropHeight,  // 源图像裁切区域
+        0, 0, cropWidth, cropHeight               // 目标区域
+      );
+
+      // 将canvas转换为blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+        }, 'image/png');
+      });
+
       const blobUrl = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
@@ -150,9 +210,11 @@ export default function MainPage() {
               brightness={brightness}
               contrast={contrast}
               beautyMode={beautyMode}
+              backgroundColor={backgroundColor}
               onBrightnessChange={setBrightness}
               onContrastChange={setContrast}
               onBeautyModeChange={setBeautyMode}
+              onBackgroundColorChange={setBackgroundColor}
             />
           </div>
 
@@ -164,6 +226,7 @@ export default function MainPage() {
               brightness={brightness}
               contrast={contrast}
               beautyMode={beautyMode}
+              backgroundColor={backgroundColor}
             />
             <button
               onClick={handleDownload}
