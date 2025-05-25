@@ -188,8 +188,8 @@ export default function MainPage() {
       {/* 顶部导航 */}
       <header className="bg-blue-500 text-white p-4 shadow-md">
         <div className="container mx-auto flex items-center">
-          <i className="fa-solid fa-camera-retro text-2xl mr-2"></i>
-          <h1 className="text-xl font-bold">证件照制作工具</h1>
+          <i className="fa-solid fa-id-card text-2xl mr-2"></i>
+          <h1 className="text-xl font-bold">身份证照片制作工具</h1>
         </div>
       </header>
 
@@ -243,8 +243,9 @@ export default function MainPage() {
 
       {/* 页脚 */}
       <footer className="bg-gray-100 text-gray-600 p-4 mt-8">
-        <div className="container mx-auto text-center text-sm">
-          <p>© 2025 证件照制作工具 - 版权所有</p>
+        <div className="container mx-auto text-center text-base">
+          <p>© 2025 Powered By <a href="https://rhopaper.top" style={{ color: 'rgb(65, 183, 130)', fontWeight: 'bold' }}>RhoPaper</a></p>
+          <p style={{ fontSize: '13px' }}>All Right Reserved. | 保留所有权利。</p>
         </div>
       </footer>
     </div>
