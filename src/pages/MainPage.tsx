@@ -16,7 +16,7 @@ const removeBackground = async (imageData: string): Promise<string> => {
   const response = await fetch("https://api.remove.bg/v1.0/removebg", {
     method: "POST",
     headers: { 
-      "X-Api-Key": import.meta.env.VITE_API_KEY
+      "X-Api-Key": import.meta.env.REMOVEBG_API_KEY
     },
     body: formData,
   });
